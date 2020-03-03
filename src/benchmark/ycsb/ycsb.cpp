@@ -45,7 +45,7 @@ void RunBenchmark() {
 
 }  // namespace ycsb
 }  // namespace benchmark
-}  // namespace peloton
+}  // namespace silkstore
 
 int main(int argc, char **argv) {
     silkstore::benchmark::ycsb::ParseArguments(argc, argv,

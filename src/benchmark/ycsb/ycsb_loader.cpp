@@ -33,15 +33,23 @@ ThreadPool the_tp(THREAD_POOL_SIZE);
 YCSBTable *user_table = nullptr;
 
 void CreateYCSBDatabase() {
-    if (state.index_type == "leveldb") {
-        user_table = new LevelDB;
-    } else if (state.index_type == "silsktore") {
-        user_table = new SilkStore;
-    } else if (state.index_type == "wisckey") {
-        user_table = new WiscKey;
-    } else {
-        user_table = new PebblesDB;
-    }
+
+#ifdef ISLEVELDB
+         user_table = new LevelDB;
+#endif
+
+#ifdef ISPEBBLESDB
+    user_table = new PebblesDB;
+#endif  
+
+#ifdef ISILKSTORE
+     user_table = new SilkStore;
+#endif 
+
+#ifdef ISWISCKEY
+     user_table = new WiscKey;
+#endif
+
     leveldb::Status s = user_table->Init(state.db_path);
     if (!s.ok()) {
         exit(EXIT_FAILURE);

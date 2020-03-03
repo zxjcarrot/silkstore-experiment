@@ -5,9 +5,11 @@
 #ifndef SILKSTORE_EXPERIMENT_STORE_H
 #define SILKSTORE_EXPERIMENT_STORE_H
 
+
 #include "leveldb/status.h"
 #include <algorithm>
 #include <string>
+
 
 namespace silkstore {
 
@@ -21,8 +23,10 @@ public:
 
     virtual leveldb::Status Scan(const std::string &start_key, int num, std::vector <std::string> &values) = 0;
 
+
     virtual ~KeyValueStore() {}
 };
+
 
 class LevelDB: public KeyValueStore {
 public:
@@ -33,7 +37,10 @@ public:
     virtual leveldb::Status Get(const std::string &key, std::string &value);
 
     virtual leveldb::Status Scan(const std::string &start_key, int num, std::vector <std::string> &values);
+
 };
+
+
 
 class SilkStore: public KeyValueStore {
 public:
@@ -44,6 +51,7 @@ public:
     virtual leveldb::Status Get(const std::string &key, std::string &value);
 
     virtual leveldb::Status Scan(const std::string &start_key, int num, std::vector <std::string> &values);
+
 };
 
 class PebblesDB: public KeyValueStore {
