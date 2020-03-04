@@ -7,9 +7,6 @@
 #include "leveldb/db.h"
 #include "kv/store.h"
 
-// Include your wisckey-related header files
-
-// ./targets/wisckey_ycsb -I "wisckey" -k 100 -D "/tmp/testwisckey"
 
 namespace silkstore {
 

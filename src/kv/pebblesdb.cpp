@@ -7,9 +7,6 @@
 #include "kv/store.h"
 #include "pebblesdb/db.h"
 
-// Include your pebblesdb-related header files
-
-// ./targets/pebblesdb_ycsb -I "pebblesdb" -k 100 -D "/tmp/testpebblesdb"
 
 namespace silkstore {
 

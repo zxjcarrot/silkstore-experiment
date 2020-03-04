@@ -8,9 +8,6 @@
 #include "leveldb/iterator.h"
 #include "kv/store.h"
 
-// Include your leveldb-related header files
-// ./targets/leveldb_ycsb -I "leveldb" -k 100 -D "/tmp/testleveldb"
-
 namespace silkstore {
 
 static leveldb::DB* db;

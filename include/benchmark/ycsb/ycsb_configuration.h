@@ -62,6 +62,12 @@ public:
     // update ratio
     double update_ratio;
 
+    // range read or point read
+    bool scan_read;
+
+    // range read size: [start_key, start_key+range_size)
+    int range_size;
+
     // contention level
     double zipf_theta;
 
@@ -107,6 +113,8 @@ void ValidateBackendCount(const configuration &state);
 void ValidateOperationCount(const configuration &state);
 
 void ValidateUpdateRatio(const configuration &state);
+
+void ValidateRangeSize(const configuration &state);
 
 void ValidateZipfTheta(const configuration &state);
 

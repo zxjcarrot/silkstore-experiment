@@ -34,6 +34,8 @@ void Usage(FILE *out) {
           "   -c --column_count      :  # of columns \n"
           "   -o --operation_count   :  # of operations \n"
           "   -u --update_ratio      :  fraction of updates \n"
+          "   -s --scan_read         :  range read or point read\n"
+          "   -r --range_size        :  range read size\n"
           "   -z --zipf_theta        :  theta to control skewness \n"
           "   -e --exp_backoff       :  enable exponential backoff \n"
           "   -m --string_mode       :  store strings \n"
@@ -50,6 +52,8 @@ static struct option opts[] = {
     { "backend_count", optional_argument, NULL, 'b' },
     { "operation_count", optional_argument, NULL, 'o' },
     { "update_ratio", optional_argument, NULL, 'u' },
+    { "scan_read", no_argument, NULL, 's'},
+    { "range_size", optional_argument, NULL, 'r'},
     { "zipf_theta", optional_argument, NULL, 'z' },
     { "exp_backoff", no_argument, NULL, 'e' },
     { "string_mode", no_argument, NULL, 'm' },
@@ -115,6 +119,15 @@ void ValidateUpdateRatio(const configuration &state) {
   LOG_INFO("%s : %lf", "update_ratio", state.update_ratio);
 }
 
+void ValidateRangeSize(const configuration &state) {
+  if (state.range_size < 0) {
+    LOG_ERROR("Invalid range_size :: %d", state.range_size);
+    exit(EXIT_FAILURE);
+  }
+
+  LOG_INFO("%s : %d", "range_size", state.range_size);
+}
+
 void ValidateZipfTheta(const configuration &state) {
   if (state.zipf_theta < 0 || state.zipf_theta > 1.0) {
     LOG_ERROR("Invalid zipf_theta :: %lf", state.zipf_theta);
@@ -141,6 +154,8 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
   state.backend_count = 1;
   state.operation_count = 10;
   state.update_ratio = 0.5;
+  state.scan_read = false;
+  state.range_size = 100;
   state.zipf_theta = 0.0;
   state.exp_backoff = false;
   state.string_mode = false;
@@ -149,7 +164,7 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
   // Parse args
   while (1) {
     int idx = 0;
-    int c = getopt_long(argc, argv, "hemMI:k:d:p:b:c:o:u:z:l:y:D:P:Q:W:E:R:T:Y", opts, &idx);
+    int c = getopt_long(argc, argv, "hsemMI:k:d:p:b:c:o:u:r:z:l:y:D:P:Q:W:E:R:T:Y", opts, &idx);
 
     if (c == -1) break;
 
@@ -181,6 +196,12 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
       case 'u':
         state.update_ratio = atof(optarg);
         break;
+      case 's':
+        state.scan_read = true;
+        break;
+      case 'r':
+        state.range_size = atoi(optarg);
+        break;
       case 'z':
         state.zipf_theta = atof(optarg);
         break;
@@ -210,6 +231,7 @@ void ParseArguments(int argc, char *argv[], configuration &state) {
   ValidateBackendCount(state);
   ValidateOperationCount(state);
   ValidateUpdateRatio(state);
+  ValidateRangeSize(state);
   ValidateZipfTheta(state);
   ValidateIndexType(state);
 
@@ -227,17 +249,23 @@ void WriteOutput() {
     total_profile_memory += entry;
   }
 
+  std::string read_mode(state.scan_read ? "range read" : "point read");
+  state.scan_read ? read_mode.append("-").append(std::to_string(state.range_size)): read_mode;
+
   LOG_INFO("----------------------------------------------------------");
-  LOG_INFO("%d %d %d %lf %lf :: %lf %lf %d",
+  LOG_INFO("%s %d %d %d %lf %lf :: %lf %lf %d",
+           read_mode.c_str(),
            state.scale_factor,
            state.backend_count,
            state.operation_count,
            state.update_ratio,
+           state.range_size,
            state.zipf_theta,
            state.throughput,
            state.abort_rate,
            total_profile_memory);
 
+  out << read_mode << " ";
   out << state.scale_factor << " ";
   out << state.backend_count << " ";
   out << state.operation_count << " ";
